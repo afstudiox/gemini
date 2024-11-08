@@ -18,38 +18,37 @@ model = genai.GenerativeModel("gemini-1.5-flash",
 # Iniciar o chat
 chat = model.start_chat()
 
-MAX_PROMPT_LENGTH = 5000  
-
-def truncate_text(text, max_length=MAX_PROMPT_LENGTH):
-    if len(text) > max_length:
-        return text[:max_length] + "\n\n[Atenção: texto truncado devido ao tamanho excedente.]"
-    return text
-
 def extract_file_contents(files):
     file_contents = []
-    ignored_files = 0
-    if files:
-        for file_info in files:
-            file_path = file_info["path"]
-            if file_info["mime_type"] == "text/plain":
-                with open(file_path, "r", encoding="utf-8") as f:
-                    content = f.read()
-                if content.strip():
-                    file_contents.append(content)
-            else:
-                ignored_files += 1
-    if ignored_files:
-        file_contents.append(f"[Atenção: {ignored_files} arquivos não suportados foram ignorados.]")
-    return file_contents
+    erros = []  # Lista para armazenar mensagens de erro
+
+    for file_info in files:
+        # import pdb; pdb.set_trace()
+        file_path = file_info["path"]
+        if file_info["mime_type"] == "text/plain":
+            with open(file_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            file_contents.append(content)
+        else:
+            erros.append(f"Arquivo ignorado: {file_info['orig_name']} (tipo não suportado)")
+
+    return file_contents, erros
+
 
 def gradio_wrapper(message, _history):
     user_text = message["text"]
     files = message.get("files", [])
-    file_contents = extract_file_contents(files)
-    combined_text = truncate_text(user_text + "\n\n" + "\n\n".join(file_contents))
+    file_contents, erros = extract_file_contents(files)
+    combined_text = user_text + "\n\n" + "\n\n".join(file_contents)
     prompt = f"Analise o sentimento do seguinte texto:\n{combined_text}"
     response = chat.send_message(prompt)
-    return response.text
+    
+    feedback_message = "Análise concluída com sucesso."
+    if erros:
+        feedback_message += "\n" + "\n".join(erros)
+    
+    return feedback_message + "\n\n" + response.text
+
 
 chat_interface = gr.ChatInterface(
     fn=gradio_wrapper,
