@@ -18,6 +18,13 @@ model = genai.GenerativeModel("gemini-1.5-flash",
 # Iniciar o chat
 chat = model.start_chat()
 
+MAX_PROMPT_LENGTH = 5000  
+
+def truncate_text(text, max_length=MAX_PROMPT_LENGTH):
+    if len(text) > max_length:
+        return text[:max_length] + "\n\n[Atenção: texto truncado devido ao tamanho excedente.]"
+    return text
+
 def extract_file_contents(files):
     file_contents = []
     ignored_files = 0
@@ -39,7 +46,7 @@ def gradio_wrapper(message, _history):
     user_text = message["text"]
     files = message.get("files", [])
     file_contents = extract_file_contents(files)
-    combined_text = user_text + "\n\n" + "\n\n".join(file_contents)
+    combined_text = truncate_text(user_text + "\n\n" + "\n\n".join(file_contents))
     prompt = f"Analise o sentimento do seguinte texto:\n{combined_text}"
     response = chat.send_message(prompt)
     return response.text
