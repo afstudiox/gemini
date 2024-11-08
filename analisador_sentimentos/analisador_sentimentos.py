@@ -27,7 +27,8 @@ def extract_file_contents(files):
             if file_info["mime_type"] == "text/plain":
                 with open(file_path, "r", encoding="utf-8") as f:
                     content = f.read()
-                file_contents.append(content)
+                if content.strip():
+                    file_contents.append(content)
             else:
                 ignored_files += 1
     if ignored_files:
