@@ -5,8 +5,11 @@ import gradio as gr
 # Configure a chave de API
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
+# Criando um prompt inicial
+initial_prompt = "Você é um coordenador pedagógico que vai orientar a corpo docente da escola produzir aulas de acordo com a BNCC."
+
 # Escolha o modelo a ser usado
-model = genai.GenerativeModel("gemini-1.5-flash")
+model = genai.GenerativeModel("gemini-1.5-flash",system_instruction=initial_prompt)
 
 # Inicie um chat sem parâmetros iniciais
 chat = model.start_chat()
