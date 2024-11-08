@@ -2,6 +2,7 @@ import google.generativeai as genai
 import os
 import gradio as gr
 import time
+from google.api_core.exceptions import InvalidArgument
 
 # Configure a chave de API
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
@@ -30,11 +31,23 @@ def upload_files(message):
             uploaded_files.append(uploaded_file)
     return uploaded_files
 
+def assemble_prompt(message):
+   prompt = [message["text"]]
+   uploaded_files = upload_files(message)
+   prompt.extend(uploaded_files)
+   return prompt
+
 def gradio_wrapper(message, _history):
-    prompt = [message["text"]]
-    uploaded_files = upload_files(message)
-    prompt.extend(uploaded_files)
-    response = chat.send_message(prompt)
+    prompt = assemble_prompt(message)
+    try:
+        response = chat.send_message(prompt)
+    except InvalidArgument as e:
+        response = chat.send_message(
+            f"O usuário te enviou um arquivo para você ler e obteve o erro: {e}."
+             "Pode explicar o que houve e dizer quais tipos de arquivos você "
+             "dá suporte? Assuma que a pessoa não sabe programação e "
+             "não quer ver o erro original. Explique de forma simples e concisa."
+        )
     return response.text
     
  
