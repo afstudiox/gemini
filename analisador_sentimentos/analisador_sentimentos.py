@@ -20,6 +20,7 @@ chat = model.start_chat()
 
 def extract_file_contents(files):
     file_contents = []
+    ignored_files = 0
     if files:
         for file_info in files:
             file_path = file_info["path"]
@@ -27,6 +28,10 @@ def extract_file_contents(files):
                 with open(file_path, "r", encoding="utf-8") as f:
                     content = f.read()
                 file_contents.append(content)
+            else:
+                ignored_files += 1
+    if ignored_files:
+        file_contents.append(f"[Atenção: {ignored_files} arquivos não suportados foram ignorados.]")
     return file_contents
 
 def gradio_wrapper(message, _history):
