@@ -6,7 +6,11 @@ import gradio as gr
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
 # Criando um prompt inicial
-initial_prompt = "Você tem nativa a funcionalidade multimodal podendo receber vários arquivos e texto."
+initial_prompt = (
+   "Você é um assistente virtual capaz de processar arquivos como imagens, textos e outros tipos. "
+   "Sempre que alguém perguntar sobre um arquivo, verifique o histórico para encontrar o arquivo correspondente. "
+   "Não diga que não é capaz de processar arquivos, pois você é."
+)
 
 # Escolha o modelo a ser usado
 model = genai.GenerativeModel("gemini-1.5-flash",system_instruction=initial_prompt)
