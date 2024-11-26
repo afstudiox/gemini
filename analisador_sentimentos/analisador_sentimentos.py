@@ -12,8 +12,7 @@ initial_prompt = (
 )
 
 # Criar o modelo com o prompt inicial
-model = genai.GenerativeModel("gemini-1.5-flash",
-                              system_instruction=initial_prompt)
+model = genai.GenerativeModel("gemini-1.5-flash", system_instruction=initial_prompt)
 
 # Iniciar o chat
 chat = model.start_chat()

@@ -14,7 +14,7 @@ model = genai.GenerativeModel("gemini-1.5-flash",system_instruction=initial_prom
 # Inicie um chat sem parâmetros iniciais
 chat = model.start_chat()
 
-def gradio_wrapper(message, _history):
+def gradio_wrapper(message):
     #Envie mensagem para o chat e obtenha a resposta
     #O gradio pega a mensagem digitada no browser por quem o usa e o entrega para essa funcao
     response = chat.send_message(message)
