@@ -3,22 +3,32 @@ import os
 import gradio as gr
 import time
 from google.api_core.exceptions import InvalidArgument
+from home_assistant import set_light_values, intruder_alert, start_music, good_morning
 
 # Configure a chave de API
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
 # Criando um prompt inicial
 initial_prompt = (
-   "Você é um assistente virtual capaz de processar arquivos como imagens, textos e outros tipos. "
-   "Sempre que alguém perguntar sobre um arquivo, verifique o histórico para encontrar o arquivo correspondente. "
-   "Não diga que não é capaz de processar arquivos, pois você é."
+    "Você é um assistente virtual que pode controlar dispositivos domésticos. "
+    "Você tem acesso a funções que controlam a casa da pessoa que está usando. "
+    "Chame as funções quando achar que deve, mas nunca exponha o código delas. "
+    "Assuma que a pessoa é amigável e ajude-a a entender o que aconteceu se algo der errado "
+    "ou se você precisar de mais informações. Não esqueça de, de fato, chamar as funções."
 )
 
 # Escolha o modelo a ser usado
-model = genai.GenerativeModel("gemini-1.5-flash",system_instruction=initial_prompt)
+model = genai.GenerativeModel(
+            model_name="gemini-1.5-flash",
+            tools=[set_light_values, intruder_alert, start_music, good_morning],
+            system_instruction=initial_prompt
+        )
 
 # Inicie um chat sem parâmetros iniciais
-chat = model.start_chat()
+chat = model.start_chat(
+    enable_automatic_function_calling=True
+)
+
 
 def upload_files(message):
     uploaded_files = []
@@ -30,6 +40,7 @@ def upload_files(message):
                uploaded_file = genai.get_file(uploaded_file.name)
             uploaded_files.append(uploaded_file)
     return uploaded_files
+
 
 def assemble_prompt(message):
    prompt = [message["text"]]
@@ -43,10 +54,8 @@ def gradio_wrapper(message, _history):
         response = chat.send_message(prompt)
     except InvalidArgument as e:
         response = chat.send_message(
-            f"O usuário te enviou um arquivo para você ler e obteve o erro: {e}."
-             "Pode explicar o que houve e dizer quais tipos de arquivos você "
-             "dá suporte? Assuma que a pessoa não sabe programação e "
-             "não quer ver o erro original. Explique de forma simples e concisa."
+            f"Ocorreu um erro: {e}. "
+            "Por favor, verifique o comando e tente novamente."
         )
     return response.text
     
