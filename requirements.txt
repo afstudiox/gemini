@@ -36,6 +36,7 @@ importlib_resources==6.4.5
 itsdangerous==2.2.0
 Jinja2==3.1.4
 kiwisolver==1.4.7
+Markdown==3.7
 markdown-it-py==3.0.0
 MarkupSafe==2.1.5
 matplotlib==3.9.2

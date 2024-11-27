@@ -1,10 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Recomendações para o Usuário {{ user_id }}</title>
+    <title>Recomendações personalizadas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Recomendações Personalizadas</h1>
-    <p>{{ message }}</p>
+    <div>
+        {{ message|safe }}
+    </div>
 </body>
 </html>

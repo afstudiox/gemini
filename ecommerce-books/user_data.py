@@ -4,8 +4,9 @@ def get_user_history(user_id: int) -> dict:
     """
     # Dados simulados de histórico de compras
     user_histories = {
-        1: {'fiction': 5, 'non_fiction': 2, 'science': 0},
-        2: {'fiction': 1, 'non_fiction': 4, 'science': 1},
-        3: {'fiction': 0, 'non_fiction': 1, 'science': 5},
+        1: {'fiction': 5, 'non_fiction': 2, 'science': 0, 'technology': 0},
+        2: {'fiction': 1, 'non_fiction': 4, 'science': 1, 'technology': 0},
+        3: {'fiction': 0, 'non_fiction': 1, 'science': 5, 'technology': 2},
+        4: {'fiction': 0, 'non_fiction': 0, 'science': 0, 'technology': 10}
     }
     return user_histories.get(user_id)
