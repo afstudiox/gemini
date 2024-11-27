@@ -3,7 +3,7 @@ import os
 import gradio as gr
 import time
 from google.api_core.exceptions import InvalidArgument
-from home_assistant import set_light_values, intruder_alert, start_music, good_morning
+from home_assistant import set_light_values, intruder_alert, start_music, good_morning, set_thermostat_temperature, open_curtains
 
 # Configure a chave de API
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
@@ -20,7 +20,7 @@ initial_prompt = (
 # Escolha o modelo a ser usado
 model = genai.GenerativeModel(
             model_name="gemini-1.5-flash",
-            tools=[set_light_values, intruder_alert, start_music, good_morning],
+            tools=[set_light_values, intruder_alert, start_music, good_morning, set_thermostat_temperature, open_curtains],
             system_instruction=initial_prompt
         )
 
@@ -30,28 +30,9 @@ chat = model.start_chat(
 )
 
 
-def upload_files(message):
-    uploaded_files = []
-    if message["files"]:
-        for file_gradio_data in message["files"]:
-            uploaded_file = genai.upload_file(path=file_gradio_data["path"])
-            while uploaded_file.state.name == "PROCESSING":
-               time.sleep(5)
-               uploaded_file = genai.get_file(uploaded_file.name)
-            uploaded_files.append(uploaded_file)
-    return uploaded_files
-
-
-def assemble_prompt(message):
-   prompt = [message["text"]]
-   uploaded_files = upload_files(message)
-   prompt.extend(uploaded_files)
-   return prompt
-
 def gradio_wrapper(message, _history):
-    prompt = assemble_prompt(message)
     try:
-        response = chat.send_message(prompt)
+        response = chat.send_message(message)
     except InvalidArgument as e:
         response = chat.send_message(
             f"Ocorreu um erro: {e}. "
@@ -63,8 +44,8 @@ def gradio_wrapper(message, _history):
 # Criando a interface do chat e passando a funcao gradio_wrapper
 chat_interface = gr.ChatInterface(
     fn=gradio_wrapper,
-    title="Chatbot com Suporte a Arquivos 🤖",
-    multimodal=True
+    title="Home Assistant 🤖",
+    multimodal=False
     )
 
 # Inicie a interface
